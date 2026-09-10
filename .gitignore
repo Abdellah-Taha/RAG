@@ -1,4 +1,4 @@
-data/processed/chroma_index/
+data/processed/
 src/__pycache__
 moulinette.zip
 data/raw/vllm-0.10.1

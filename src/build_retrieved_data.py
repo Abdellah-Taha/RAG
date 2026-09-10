@@ -12,7 +12,7 @@ def cached_retrieval(query: str, max_k=50):
 def cached_chromadb_retrieval(query: str, max_k=50):
     return chromadb_retrieval(query, max_k)
 
-def build_chromadb_retrieved_data(query: str, id: str, k: int, meta_data: List[dict]):
+def build_chromadb_retrieved_data(query: str, k: int, meta_data: List[dict], id=""):
     minimal_search_results = MinimalSearchResults(question_id=id, question=query, retrieved_sources=[])
     results = cached_chromadb_retrieval(query, max_k=50)
     meta_by_chunk_id = {m["chunk_id"]: m for m in meta_data} # create a mapping from chunk_id to meta_data for quick lookup
@@ -30,7 +30,8 @@ def build_chromadb_retrieved_data(query: str, id: str, k: int, meta_data: List[d
     return minimal_search_results
 
 
-def build_retrieved_data(query: str,id: str, k: int, meta_data: List[dict]):
+
+def build_retrieved_data(query: str, k: int, meta_data: List[dict], id=""):
     minimal_search_results = MinimalSearchResults(question_id=id, question=query, retrieved_sources=[])
     results, scores = cached_retrieval(query, max_k=50)
     

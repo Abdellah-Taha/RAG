@@ -117,6 +117,7 @@ def json_dump_search_results(answers: StudentSearchResultsAndAnswer, output_file
         search_results_list["search_results"].append(data_dict)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(search_results_list, f, ensure_ascii=False, indent=4)
+    return output_file
         
 def json_dump_search_and_answers(answers: StudentSearchResultsAndAnswer, output_file: str):
     search_results_list = {
