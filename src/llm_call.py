@@ -3,6 +3,7 @@ from typing import List
 from data_models import StudentSearchResults, MinimalSearchResults, MinimalSource,StudentSearchResultsAndAnswer, MinimalAnswer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import re, json
+from pathlib import Path
 
 
 def strip_thinking(text: str) -> str:
@@ -115,6 +116,7 @@ def json_dump_search_results(answers: StudentSearchResultsAndAnswer, output_file
             ]
         }
         search_results_list["search_results"].append(data_dict)
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(search_results_list, f, ensure_ascii=False, indent=4)
     return output_file
@@ -139,5 +141,6 @@ def json_dump_search_and_answers(answers: StudentSearchResultsAndAnswer, output_
             "answer": data.answer
         }
         search_results_list["search_results"].append(data_dict)
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(search_results_list, f, ensure_ascii=False, indent=4)

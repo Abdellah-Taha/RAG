@@ -51,13 +51,13 @@ def build_retrieved_data(query: str, k: int, meta_data: List[dict], id=""):
 def total_search_results(queries: List[str],question_ids: List[str], k: int, meta_data: List[dict]) -> StudentSearchResults:
     student_search_results = StudentSearchResults(search_results=[], k=k)
     for query, id in zip(queries, question_ids):
-        search_result = build_retrieved_data(query, id, k, meta_data)
+        search_result = build_retrieved_data(query, k, meta_data, id=id)
         student_search_results.search_results.append(search_result)
     return student_search_results
 
 def total_chromadb_search_results(queries: List[str], question_ids: List[str], k: int, meta_data: List[dict]) -> StudentSearchResults:
     student_search_results = StudentSearchResults(search_results=[], k=k)
     for query, id in zip(queries, question_ids):
-        search_result = build_chromadb_retrieved_data(query, id, k, meta_data)
+        search_result = build_chromadb_retrieved_data(query, k, meta_data, id=id)
         student_search_results.search_results.append(search_result)
     return student_search_results

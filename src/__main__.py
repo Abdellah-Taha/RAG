@@ -56,13 +56,13 @@ class Rag:
             
         return results
     
-    def search_dataset(self, dataset_path, k=5):
+    def search_dataset(self, dataset_path, k=5, save_directory="data/output/search_results"):
         metadata = self.index()
         question_ids = retrieve_question_id(dataset_path)
         questions = retrieve_questions(dataset_path)
         student_search_results = total_search_results(questions, question_ids, k, meta_data=metadata)
         output_file = json_dump_search_results(student_search_results,
-                                 "data/output/search_results/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
+                                 save_directory + "/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
                                 )
         print(f"Saved student_search_results to {output_file}")
         return output_file
@@ -73,7 +73,7 @@ class Rag:
         minimal_search_results = build_retrieved_data(query, k, meta_data=metadata, id="1")
         print(generate_response(minimal_search_results))
     
-    def answer_dataset(self, dataset_path, k=5):
+    def answer_dataset(self, student_search_results_path, save_directory):
         data_file = self.search_dataset(dataset_path, k)
         student_result_and_answers = call_llm_foreach_query(data_file)
         output_file = json_dump_search_and_answers(student_result_and_answers,
@@ -83,10 +83,10 @@ class Rag:
 
 
 def main():
-    try:
-        fire.Fire(Rag)
-    except Exception as e:
-        print(f"Error: {e}")
+    # try:
+    fire.Fire(Rag)
+    # except Exception as e:
+        # print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
