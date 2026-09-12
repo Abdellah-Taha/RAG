@@ -40,9 +40,9 @@ class Rag:
         pass
     
     def index(self, max_chunk_size=2000):
-        metadata = index_files(max_chunk_size)
+        index_files(max_chunk_size)
+        chromadb_indexing(max_chunk_size)
         print("Ingestion complete! Indices saved under data/processed/")
-        return metadata
     
     def search(self, query, k=5):
         metadata = self.index() 

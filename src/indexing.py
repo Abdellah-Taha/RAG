@@ -10,32 +10,72 @@ import tqdm
 BATCH_SIZE = 600
 data_path = pathlib.Path("data/raw/vllm-0.10.1")
 
-def index_files(chunk_size: int) -> List[dict]:
+def check_update_on_files(data_path: pathlib.Path, processed_data_path: pathlib.Path):
     try:
-        sample = retrieve_files(data_path)
-        documents: List[Document] = load_and_split(sample, chunk_size)
-        content = []
-        metadata = []
-        for document in tqdm.tqdm(documents, desc="BM25 indexing"):
-            content.append(document.page_content)
-            metadata.append({
-            "file_path": document.metadata["source"],
-            "start": document.metadata["start_index"],
-            "end": document.metadata["start_index"] + len(document.page_content),
-            })
-            
-        corpus = bm25s.tokenize(content)
-        indexer = bm25s.BM25()
-        indexer.index(corpus)
-        indexer.save("data/processed/bm25_index")
-        return metadata
+        updated_files = []
+        raw_files = list(data_path.glob("**/*"))
+        processed_last_update = processed_data_path.stat().st_mtime if processed_data_path.exists() else 0
+        for raw_file in raw_files:
+            if raw_file.is_file():
+                if raw_file.stat().st_mtime > processed_last_update:
+                    updated_files.append(raw_file)
+        if updated_files:
+            print(f"Found {len(updated_files)} updated files. Proceeding with indexing.")
+        return updated_files
+    except Exception as e:
+        print(f"Error while retrieving raw files: {e}")
+        return False
+
+
+
+def index_updated_files(chunk_size: int) -> List[dict]:
+    try:
+        updated_files = check_update_on_files(data_path, pathlib.Path("data/processed/bm25_index"))
+        
+        ...
     except Exception as e:
         print(f"Error during indexing: {e}")
         exit(3)
 
+def index_files(chunk_size: int) -> List[dict]:
+    try:
+        updated_files = check_update_on_files(data_path, pathlib.Path("data/processed/bm25_index"))
+        processed_data_path = pathlib.Path("data/processed/bm25_index")
+        if not processed_data_path.exists():
+            sample = retrieve_files(data_path)
+            documents: List[Document] = load_and_split(sample, chunk_size)
+            content = []
+            metadata = []
+            for document in tqdm.tqdm(documents, desc="BM25 indexing"):
+                content.append(document.page_content)
+                metadata.append({
+                "file_path": document.metadata["source"],
+                "start": document.metadata["start_index"],
+                "end": document.metadata["start_index"] + len(document.page_content),
+                })
+                
+            corpus = bm25s.tokenize(content)
+            indexer = bm25s.BM25()
+            indexer.index(corpus)
+            indexer.save("data/processed/bm25_index")
+            return metadata
+        elif not updated_files:
+            print("No new files to index. Skipping BM25 indexing.")
+            return []
+        else:
+            index_updated_files(chunk_size)
+    except Exception as e:
+        print(f"Error during indexing: {e}")
+        exit(3)
+
+
+
 @lru_cache(maxsize=128)
 def chromadb_indexing(chunk_size: int):
     try:
+        if not check_update_on_files(data_path, pathlib.Path("data/processed/chroma_index")):
+            print("No new files to index. Skipping ChromaDB indexing.")
+            return []
         sample = retrieve_files(data_path)  
         documents: List = load_and_split(sample, chunk_size)
         content = []
@@ -75,17 +115,3 @@ def chromadb_indexing(chunk_size: int):
     except Exception as e:
         print(f"Error during ChromaDB indexing: {e}")
         exit(3)
-
-import time
-def main():
-    chunk_size = 2000
-    start_time = time.time()
-    index_files(chunk_size)
-    end_time = time.time()
-    print(f"BM25 indexing complete in {end_time - start_time:.2f} seconds.")
-    start_time = time.time()
-    chromadb_indexing(chunk_size)
-    end_time = time.time()
-    print(f"chromadb indexing complete in {end_time - start_time:.2f} seconds.")
-if __name__ == "__main__":
-    main()
