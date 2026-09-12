@@ -2,7 +2,6 @@ import pathlib
 from typing import List
 from langchain_core.documents import Document
 
-
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -22,6 +21,7 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
     except BaseException as e:
         print(e)
         exit(1)
+
 
 def load_and_split(list_of_files: list[pathlib.Path], chunk_size) -> List[Document]:
     try:

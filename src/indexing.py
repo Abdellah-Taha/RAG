@@ -12,8 +12,8 @@ data_path = pathlib.Path("data/raw/vllm-0.10.1")
 
 def check_update_on_files(data_path: pathlib.Path, processed_data_path: pathlib.Path):
     try:
-        updated_files = []
-        raw_files = list(data_path.glob("**/*"))
+        updated_files: List[pathlib.Path] = []
+        raw_files: List[pathlib.Path] = list(data_path.glob("**/*"))
         processed_last_update = processed_data_path.stat().st_mtime if processed_data_path.exists() else 0
         for raw_file in raw_files:
             if raw_file.is_file():
@@ -44,8 +44,8 @@ def index_files(chunk_size: int) -> List[dict]:
         if not processed_data_path.exists():
             sample = retrieve_files(data_path)
             documents: List[Document] = load_and_split(sample, chunk_size)
-            content = []
-            metadata = []
+            content: List[str] = []
+            metadata: List[dict] = []
             for document in tqdm.tqdm(documents, desc="BM25 indexing"):
                 content.append(document.page_content)
                 metadata.append({
@@ -77,10 +77,10 @@ def chromadb_indexing(chunk_size: int):
             print("No new files to index. Skipping ChromaDB indexing.")
             return []
         sample = retrieve_files(data_path)  
-        documents: List = load_and_split(sample, chunk_size)
-        content = []
-        metadata = []
-        chunk_ids = []
+        documents: List[Document] = load_and_split(sample, chunk_size)
+        content: List[str] = []
+        metadata: List[dict] = []
+        chunk_ids: List[str] = []
 
         for document in documents:
             content.append(document.page_content)
