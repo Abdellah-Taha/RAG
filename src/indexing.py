@@ -26,44 +26,39 @@ def check_update_on_files(data_path: pathlib.Path, processed_data_path: pathlib.
         print(f"Error while retrieving raw files: {e}")
         return False
 
-
-
-def index_updated_files(chunk_size: int) -> List[dict]:
-    try:
-        updated_files = check_update_on_files(data_path, pathlib.Path("data/processed/bm25_index"))
-        
-        ...
-    except Exception as e:
-        print(f"Error during indexing: {e}")
-        exit(3)
-
 def index_files(chunk_size: int) -> List[dict]:
+    #check if the processed data already exists if it does and up to date then skip indexing
+    #if the processed data does not exist index the entire corpus
+    #if the data has been updated then re-load, re-chunk and re-tokenize only the updated files then re-index the entire data 
+    
     try:
-        updated_files = check_update_on_files(data_path, pathlib.Path("data/processed/bm25_index"))
         processed_data_path = pathlib.Path("data/processed/bm25_index")
+        updated_files = check_update_on_files(data_path, processed_data_path)
+        sample = retrieve_files(data_path)
+        documents: List[Document] = load_and_split(sample, chunk_size)
+        content: List[str] = []
+        metadata: List[dict] = []
+        for document in tqdm.tqdm(documents, desc="BM25 indexing"):
+            content.append(document.page_content)
+            metadata.append({
+            "file_path": document.metadata["source"],
+            "start": document.metadata["start_index"],
+            "end": document.metadata["start_index"] + len(document.page_content),
+            })
         if not processed_data_path.exists():
-            sample = retrieve_files(data_path)
-            documents: List[Document] = load_and_split(sample, chunk_size)
-            content: List[str] = []
-            metadata: List[dict] = []
-            for document in tqdm.tqdm(documents, desc="BM25 indexing"):
-                content.append(document.page_content)
-                metadata.append({
-                "file_path": document.metadata["source"],
-                "start": document.metadata["start_index"],
-                "end": document.metadata["start_index"] + len(document.page_content),
-                })
-                
+            #normal indexing of the entire corpus
+                    
             corpus = bm25s.tokenize(content)
             indexer = bm25s.BM25()
             indexer.index(corpus)
             indexer.save("data/processed/bm25_index")
-            return metadata
-        elif not updated_files:
-            print("No new files to index. Skipping BM25 indexing.")
-            return []
+        elif updated_files:
+            # re chunking only the updated files in the list
+            ...
         else:
-            index_updated_files(chunk_size)
+            #skiping indexing as the processed data is up to date
+            ...
+        return metadata
     except Exception as e:
         print(f"Error during indexing: {e}")
         exit(3)
@@ -73,9 +68,6 @@ def index_files(chunk_size: int) -> List[dict]:
 @lru_cache(maxsize=128)
 def chromadb_indexing(chunk_size: int):
     try:
-        if not check_update_on_files(data_path, pathlib.Path("data/processed/chroma_index")):
-            print("No new files to index. Skipping ChromaDB indexing.")
-            return []
         sample = retrieve_files(data_path)  
         documents: List[Document] = load_and_split(sample, chunk_size)
         content: List[str] = []

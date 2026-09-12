@@ -23,6 +23,25 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
         exit(1)
 
 
+def load_and_split_updated_files(list_of_files: list[pathlib.Path], chunk_size) -> List[Document]:
+    try:
+        if chunk_size <= 0 or chunk_size > 2000:
+            raise ValueError("chunk_size must be between 1 and 2000")
+        updated_documents: List[Document] = []
+        splitter = RecursiveCharacterTextSplitter(
+            add_start_index=True,
+            chunk_size=chunk_size,
+            chunk_overlap=0
+            )
+        for file_path in list_of_files:
+            loader = TextLoader(file_path, autodetect_encoding=True)
+            loaded_documents = loader.load()
+            updated_documents.extend(splitter.split_documents(loaded_documents))
+        return updated_documents
+    except Exception as e:
+        print(e)
+        exit(1)
+
 def load_and_split(list_of_files: list[pathlib.Path], chunk_size) -> List[Document]:
     try:
         if chunk_size <= 0 or chunk_size > 2000:
