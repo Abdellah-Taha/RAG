@@ -45,17 +45,18 @@ def index_files(chunk_size: int) -> List[dict]:
             "start": document.metadata["start_index"],
             "end": document.metadata["start_index"] + len(document.page_content),
             })
-        if not processed_data_path.exists():
-            #normal indexing of the entire corpus
+        if processed_data_path.exists() and  updated_files:
+            print("processed data is up to date. Skipping indexing.")
+            return metadata
                     
+        elif not processed_data_path.exists():
+            #normal indexing of the entire corpus
+            ...
+        else:
             corpus = bm25s.tokenize(content)
             indexer = bm25s.BM25()
             indexer.index(corpus)
             indexer.save("data/processed/bm25_index")
-        elif updated_files:
-            # re chunking only the updated files in the list
-            ...
-        else:
             #skiping indexing as the processed data is up to date
             ...
         return metadata
