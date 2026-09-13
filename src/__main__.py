@@ -4,37 +4,6 @@ from indexing import index_files, chromadb_indexing, get_metadata
 from build_retrieved_data import build_retrieved_data, cached_retrieval, total_search_results
 import fire, time
 
-# def main():
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--k", type=int, default=5)
-    # parser.add_argument("--max_chunk_size", type=int, default=2000)
-    # parser.add_argument("--dataset_path", type=str, default="RAG/data/datasets/AnsweredQuestions/dataset_docs_public.json")
-    # parser.add_argument("--max_chunk_size", type=int, )
-    # args = parser.parse_args()
-    # output_search_file = "data/output/search_results/" + args.dataset_path.split("/")[-2] + "/" + args.dataset_path.split("/")[-1]
-    # output_search_and_answer_file = "data/output/search_results_and_answer/" + args.dataset_path.split("/")[-2] + "/" + args.dataset_path.split("/")[-1]
-    # print(output_search_file)
-    # print(output_search_and_answer_file)
-    # start_time = time.time()
-    # indexing the data files
-    # meta_data = index_files(args.max_chunk_size)
-    # meta_data = chromadb_indexing(args.max_chunk_size)
-    # end_time = time.time()
-    # print(f"Indexing complete in {end_time - start_time:.2f} seconds. You can now use the BM25 retriever for searching.")
-    # retrieving the questions from the json file
-    # questions = retrieve_questions(args.dataset_path)
-    # question_ids = retrieve_question_id(args.dataset_path)
-    # retrieving the relevent data for each query (RA ANA LI KANTB HACHI MACHI AI AW9S) 
-    # search_results = total_search_results(questions, question_ids, args.k, meta_data=meta_data) # bm25 search results
-    # search_results = total_chromadb_search_results(questions, question_ids, args.k, meta_data=meta_data) # chromadb search results
-    # sending the search results to the llm
-    # start = time.time()
-    # student_result_and_answers = call_llm_foreach_query(search_results)
-    # end = time.time()
-    # print(f"\nTime taken: {end - start:.2f}")
-    # json_dump_search_and_answers(student_result_and_answers, output_search_and_answer_file)
-    # json_dump_search_results(student_result_and_answers, output_search_file)
-
 class Rag:
     def __init__(self):
         pass
@@ -47,32 +16,26 @@ class Rag:
         print(f"Ingestion complete! Indices saved under data/processed/ (Time taken: {end_time - start_time:.2f} seconds)")
     
     def search(self, query, k=5):
-        metadata, _ = get_metadata()
-        
-        results = cached_retrieval(query, k)
-        
-        for doc_idx in results[0][0]:
-            idx = int(doc_idx)
-            print(f"File Path: {metadata[idx]['file_path']}", end=" ")
-            print(f"[{metadata[idx]['start']}:{metadata[idx]['end']}]")
-            
-        return results
+        data = build_retrieved_data(query, k)
+        for record in data.retrieved_sources:
+            print(f"File Path: {record.file_path}", end=" ")
+            print(f"[{record.first_character_index}:{record.last_character_index}]")
+    
     
     def search_dataset(self, dataset_path, k=5, save_directory="data/output/search_results"):
-        _, _ = get_metadata(2000)
         question_ids = retrieve_question_id(dataset_path)
         questions = retrieve_questions(dataset_path)
-        student_search_results = total_search_results(questions, question_ids, k, meta_data=metadata)
-        output_file = json_dump_search_results(student_search_results,
-                                 save_directory + "/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
-                                )
+        student_search_results = total_search_results(questions, question_ids, k)
+        output_file = json_dump_search_results(
+            student_search_results,
+            save_directory + "/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
+        )
         print(f"Saved student_search_results to {output_file}")
-        return output_file
 
     
     def answer(self, query, k=5):
         metadata = self.index()
-        minimal_search_results = build_retrieved_data(query, k, meta_data=metadata, id="1")
+        minimal_search_results = build_retrieved_data(query, k)
         print(generate_response(minimal_search_results))
     
     def answer_dataset(self, student_search_results_path, save_directory):

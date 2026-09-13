@@ -5,17 +5,18 @@ import chromadb
 @lru_cache()
 def load_bm25_index():
     try:
-        retriever = bm25s.BM25.load("data/processed/bm25_index")
-        return retriever
+        return bm25s.BM25.load("data/processed/bm25_index", load_corpus=True, mmap=True)
     except Exception as e:
         print(f"Error loading BM25 index: {e}")
         exit(4)
-        
+
 def retrieval(query: str, k: int):
     try:
         retriever = load_bm25_index()
         query_tokens = bm25s.tokenize(query)
-        results, scores = retriever.retrieve(query_tokens, k=k)
+        results, scores = retriever.retrieve(
+            query_tokens, corpus=retriever.corpus, k=k    # <- results are now your dicts
+        )
         return results, scores
     except Exception as e:
         print(f"Error during retrieval: {e}, line: {e.__traceback__.tb_lineno}")

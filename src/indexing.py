@@ -43,11 +43,15 @@ def index_files(chunk_size: int):
     try:
         sample = retrieve_files(data_path)
         documents: List[Document] = load_and_split(sample, chunk_size)
-        _, content = get_metadata(documents)
+        metadata, content = get_metadata(documents)
+        records = [
+            {**meta, "text": text}
+            for meta, text in zip(metadata, content)
+        ]
         corpus = bm25s.tokenize(content)
         indexer = bm25s.BM25()
         indexer.index(corpus)
-        indexer.save("data/processed/bm25_index")
+        indexer.save("data/processed/bm25_index", corpus=records)
     except Exception as e:
         print(f"Error during indexing: {e}")
         exit(3)

@@ -31,27 +31,22 @@ def build_chromadb_retrieved_data(query: str, k: int, meta_data: List[dict], id=
 
 
 
-def build_retrieved_data(query: str, k: int, meta_data: List[dict], id=""):
+def build_retrieved_data(query: str, k: int, id=""):
     minimal_search_results = MinimalSearchResults(question_id=id, question=query, retrieved_sources=[])
     results, scores = cached_retrieval(query, max_k=50)
-    
-    limit = min(k, len(results[0]))
-    
-    for i in range(limit):
-        doc_idx = results[0][i]
-        minimal_source = MinimalSource(
-            file_path=meta_data[doc_idx]['file_path'],
-            first_character_index=meta_data[doc_idx]['start'],
-            last_character_index=meta_data[doc_idx]['end'],
-        )
-        minimal_search_results.retrieved_sources.append(minimal_source)
-        
+
+    for record in results[0][:k]:
+        minimal_search_results.retrieved_sources.append(MinimalSource(
+            file_path=record["file_path"],
+            first_character_index=record["start"],
+            last_character_index=record["end"],
+        ))
     return minimal_search_results
 
-def total_search_results(queries: List[str],question_ids: List[str], k: int, meta_data: List[dict]) -> StudentSearchResults:
+def total_search_results(queries: List[str], question_ids: List[str], k: int) -> StudentSearchResults:
     student_search_results = StudentSearchResults(search_results=[], k=k)
     for query, id in zip(queries, question_ids):
-        search_result = build_retrieved_data(query, k, meta_data, id=id)
+        search_result = build_retrieved_data(query, k, id=id)
         student_search_results.search_results.append(search_result)
     return student_search_results
 
