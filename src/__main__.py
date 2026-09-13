@@ -1,8 +1,8 @@
 from llm_call import call_llm_foreach_query, generate_response, json_dump_search_and_answers, json_dump_search_results
 from search_dataset import retrieve_question_id, retrieve_questions
-from indexing import index_files, chromadb_indexing
+from indexing import index_files, chromadb_indexing, get_metadata
 from build_retrieved_data import build_retrieved_data, cached_retrieval, total_search_results
-import fire
+import fire, time
 
 # def main():
     # parser = argparse.ArgumentParser()
@@ -40,12 +40,14 @@ class Rag:
         pass
     
     def index(self, max_chunk_size=2000):
+        start_time = time.time()
         index_files(max_chunk_size)
-        chromadb_indexing(max_chunk_size)
-        print("Ingestion complete! Indices saved under data/processed/")
+        # chromadb_indexing(max_chunk_size)
+        end_time = time.time()
+        print(f"Ingestion complete! Indices saved under data/processed/ (Time taken: {end_time - start_time:.2f} seconds)")
     
     def search(self, query, k=5):
-        metadata = self.index() 
+        metadata, _ = get_metadata()
         
         results = cached_retrieval(query, k)
         
@@ -57,7 +59,7 @@ class Rag:
         return results
     
     def search_dataset(self, dataset_path, k=5, save_directory="data/output/search_results"):
-        metadata = self.index()
+        _, _ = get_metadata(2000)
         question_ids = retrieve_question_id(dataset_path)
         questions = retrieve_questions(dataset_path)
         student_search_results = total_search_results(questions, question_ids, k, meta_data=metadata)
