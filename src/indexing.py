@@ -10,23 +10,6 @@ import tqdm
 BATCH_SIZE = 600
 data_path = pathlib.Path("data/raw/vllm-0.10.1")
 
-def check_update_on_files(data_path: pathlib.Path, processed_data_path: pathlib.Path):
-    try:
-        updated_files: List[pathlib.Path] = []
-        all_files: List[pathlib.Path] = retrieve_files(data_path)
-        raw_files: List[pathlib.Path] = list(data_path.glob("**/*"))
-        processed_last_update = processed_data_path.stat().st_mtime if processed_data_path.exists() else 0
-        for raw_file in raw_files:
-            if raw_file.is_file():
-                if raw_file.stat().st_mtime > processed_last_update:
-                    updated_files.append(raw_file)
-        if updated_files:
-            print(f"Found {len(updated_files)} updated files. Proceeding with indexing.")
-        return updated_files if updated_files else all_files
-    except Exception as e:
-        print(f"Error while retrieving raw files: {e}")
-        return False
-
 def get_metadata(documents: List[Document]):
     content: List[str] = []
     metadata: List[dict] = []

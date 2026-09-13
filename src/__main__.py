@@ -1,3 +1,5 @@
+import json
+
 from llm_call import call_llm_foreach_query, generate_response, json_dump_search_and_answers, json_dump_search_results
 from search_dataset import retrieve_question_id, retrieve_questions
 from indexing import index_files, chromadb_indexing, get_metadata
@@ -16,6 +18,7 @@ class Rag:
         print(f"Ingestion complete! Indices saved under data/processed/ (Time taken: {end_time - start_time:.2f} seconds)")
     
     def search(self, query, k=5):
+        #check if processed data exists, if not, run index
         data = build_retrieved_data(query, k)
         for record in data.retrieved_sources:
             print(f"File Path: {record.file_path}", end=" ")
@@ -39,7 +42,9 @@ class Rag:
         print(generate_response(minimal_search_results))
     
     def answer_dataset(self, student_search_results_path, save_directory):
-        data_file = self.search_dataset(dataset_path, k)
+        # data_file = self.search_dataset(dataset_path, k)
+        data_file = json.load(open(student_search_results_path, "r"))
+        queries = [item["question"] for item in data_file]
         student_result_and_answers = call_llm_foreach_query(data_file)
         output_file = json_dump_search_and_answers(student_result_and_answers,
                                  "data/output/search_results_and_answer/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
