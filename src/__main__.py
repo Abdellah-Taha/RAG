@@ -25,7 +25,7 @@ class Rag:
             print(f"[{record.first_character_index}:{record.last_character_index}]")
     
     
-    def search_dataset(self, dataset_path, k=5, save_directory="data/output/search_results"):
+    def search_dataset(self, dataset_path, k=10, save_directory="data/output/search_results"):
         question_ids = retrieve_question_id(dataset_path)
         questions = retrieve_questions(dataset_path)
         student_search_results = total_search_results(questions, question_ids, k)
@@ -37,7 +37,7 @@ class Rag:
 
     
     def answer(self, query, k=5):
-        metadata = self.index()
+        # metadata = self.index()
         minimal_search_results = build_retrieved_data(query, k)
         print(generate_response(minimal_search_results))
     
@@ -51,6 +51,9 @@ class Rag:
                                 )
         return output_file
 
+    
+    def evaluate(self, student_search_results_path, dataset_path):
+        ...
 
 def main():
     # try:

@@ -15,7 +15,7 @@ def retrieval(query: str, k: int):
         retriever = load_bm25_index()
         query_tokens = bm25s.tokenize(query)
         results, scores = retriever.retrieve(
-            query_tokens, corpus=retriever.corpus, k=k    # <- results are now your dicts
+            query_tokens, corpus=retriever.corpus, k=k
         )
         return results, scores
     except Exception as e:
