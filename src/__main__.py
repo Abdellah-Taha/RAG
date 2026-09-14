@@ -1,7 +1,7 @@
 import json
 
 from llm_call import call_llm_foreach_query, generate_response, json_dump_search_and_answers, json_dump_search_results
-from search_dataset import retrieve_question_id, retrieve_questions
+from search_dataset import evaluate_data, retrieve_question_id, retrieve_questions
 from indexing import index_files, chromadb_indexing, get_metadata
 from build_retrieved_data import build_retrieved_data, cached_retrieval, total_search_results
 import fire, time
@@ -53,7 +53,7 @@ class Rag:
 
     
     def evaluate(self, student_search_results_path, dataset_path):
-        ...
+        evaluate_data(student_search_results_path, dataset_path)
 
 def main():
     # try:
