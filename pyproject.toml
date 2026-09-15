@@ -1,5 +1,5 @@
 [project]
-name = "rag-against-the-machine"
+name = "aaaa"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -19,3 +19,10 @@ dependencies = [
     "tqdm>=4.67.3",
     "transformers>=5.8.1",
 ]
+[project.scripts]
+aaaa = "aaaa:main"
+
+[build-system]
+requires = ["uv_build>=0.12.8,<0.13.0"]
+build-backend = "uv_build"
+
