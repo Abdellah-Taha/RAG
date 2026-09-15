@@ -25,7 +25,7 @@ def retrieve_question_id(file_path: str):
     data_set = parse_data_set(file_path)
     return [item["question_id"] for item in data_set]
 
-def compute_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
+def calculate_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
     inter_start = max(a_start, b_start)
     inter_end = min(a_end, b_end)
     intersection = max(0, inter_end - inter_start)
@@ -58,7 +58,7 @@ def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float
 
             gold_sources = dataset_result["sources"]
             if not gold_sources:
-                continue  # nothing to recall for this question
+                continue
 
             retrieved_sources = student_result["retrieved_sources"][:k]
 
@@ -66,7 +66,7 @@ def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float
             for gold in gold_sources:
                 match = any(
                     retrieved["file_path"] == gold["file_path"]
-                    and compute_iou(
+                    and calculate_iou(
                         gold["first_character_index"], gold["last_character_index"],
                         retrieved["first_character_index"], retrieved["last_character_index"],
                     ) >= iou_threshold
@@ -88,6 +88,7 @@ def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float
     except Exception as e:
         print(f"Error during evaluation: {e} at line: {e.__traceback__.tb_lineno}")
         exit(99)
+
 
 def main():
     evaluate_data("data/output/search_results/AnsweredQuestions/dataset_docs_public.json",
