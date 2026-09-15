@@ -37,10 +37,11 @@ class Rag:
     def search_dataset(self, dataset_path, k=10, save_directory="data/output/search_results"):
         if save_directory != "data/output/search_results":
             output_path = save_directory
-        elif ("data/datasets/AnsweredQuestions" or "data/datasets/UnansweredQuestions") in dataset_path and save_directory == "data/output/search_results":
+        elif "data/datasets/AnsweredQuestions/" in dataset_path or "data/datasets/UnansweredQuestions/" in dataset_path:
             output_path = save_directory + "/" + dataset_path.split("/")[-2] + "/" + dataset_path.split("/")[-1]
-        elif ("data/datasets/AnsweredQuestions" or "data/datasets/UnansweredQuestions") not in dataset_path:
+        else:
             output_path = "data/output/search_results/user_output.json"
+            
         if not os.path.exists(output_path):
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         question_ids = retrieve_question_id(dataset_path)

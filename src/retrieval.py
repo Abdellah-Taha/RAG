@@ -23,16 +23,19 @@ def retrieval(query: str, k: int):
         exit(4)
         
 
+@lru_cache()
+def load_chroma_collection():
+    try:
+        client = chromadb.PersistentClient(path="data/processed/chroma_index")
+        return client.get_collection(name="rag_collection")
+    except Exception as e:
+        print(f"Error loading Chroma collection: {e}")
+        exit(4)
+
 def chromadb_retrieval(query: str, k: int):
     try:
-        indexed_data_path = "data/processed/chroma_index"
-        client = chromadb.PersistentClient(path=indexed_data_path)
-        collection = client.get_collection(name="rag_collection")
-        results = collection.query(
-            query_texts=[query],
-            n_results=k
-        )
-        return results
+        collection = load_chroma_collection()
+        return collection.query(query_texts=[query], n_results=k)
     except Exception as e:
         print(f"Error during retrieval: {e}, line: {e.__traceback__.tb_lineno}")
         exit(4)
