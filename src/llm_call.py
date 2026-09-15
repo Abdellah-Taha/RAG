@@ -1,6 +1,6 @@
 from functools import lru_cache
 from typing import List
-from data_models import StudentSearchResults, MinimalSearchResults, MinimalSource,StudentSearchResultsAndAnswer, MinimalAnswer
+from .data_models import StudentSearchResults, MinimalSearchResults, MinimalSource,StudentSearchResultsAndAnswer, MinimalAnswer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import re, json
 from pathlib import Path

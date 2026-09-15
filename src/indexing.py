@@ -1,6 +1,6 @@
 from functools import lru_cache
 from typing import List
-from data_loading import retrieve_files, load_and_split
+from .data_loading import retrieve_files, load_and_split
 from langchain_core.documents import Document
 import bm25s, pathlib
 import chromadb

@@ -1,8 +1,8 @@
 from typing import List
-from build_retrieved_data import total_search_results, total_chromadb_search_results
+from .build_retrieved_data import total_search_results, total_chromadb_search_results
 import json
 
-from data_models import MinimalSource
+from .data_models import MinimalSource
 
 path_code = "data/datasets/AnsweredQuestions/dataset_code_public.json"
 path_docs = "data/datasets/AnsweredQuestions/dataset_docs_public.json"

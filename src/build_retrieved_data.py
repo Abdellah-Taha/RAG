@@ -1,6 +1,6 @@
-from data_models import MinimalSearchResults, MinimalSource, StudentSearchResults
+from .data_models import MinimalSearchResults, MinimalSource, StudentSearchResults
 from typing import List
-from retrieval import chromadb_retrieval, retrieval
+from .retrieval import chromadb_retrieval, retrieval
 from functools import lru_cache
 from collections import defaultdict
 import time
@@ -118,8 +118,8 @@ def reciprocal_rank_fusion(
     return fused_per_query
 
 
-from indexing import index_files, chromadb_indexing
-from llm_call import json_dump_search_results
+from .indexing import index_files, chromadb_indexing
+from .llm_call import json_dump_search_results
 
 def main():
     query = "How to configure the OpenAi server"
