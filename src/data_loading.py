@@ -26,7 +26,9 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
         exit(1)
 
 
-def _build_splitters(chunk_size: int):
+
+def _build_splitters(chunk_size: int) -> tuple[RecursiveCharacterTextSplitter,
+                                               RecursiveCharacterTextSplitter]:
     code_splitter = RecursiveCharacterTextSplitter.from_language(
         language=Language.PYTHON,
         chunk_size=chunk_size,
