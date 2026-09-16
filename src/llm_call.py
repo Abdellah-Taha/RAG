@@ -10,6 +10,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import re
 import json
 from pathlib import Path
+from typing import Any
 
 
 def strip_thinking(text: str) -> str:
@@ -22,7 +23,9 @@ class Llm:
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(model_name)
 
-    def generate(self, prompt: str, max_new_tokens=150):
+    def generate(self,
+                 prompt: str,
+                 max_new_tokens: int = 150) -> Any:
         message = [
             {
                 "role": "system",
@@ -68,11 +71,11 @@ includes a specific endpoint, command, "
 
 
 @lru_cache()
-def call_llm():
+def call_llm() -> Any:
     return Llm()
 
 
-def extract_text_from_context(context: MinimalSearchResults):
+def extract_text_from_context(context: MinimalSearchResults) -> Any:
     for path in context.retrieved_sources:
         with open(path.file_path, "r", encoding="utf-8") as f:
             text = f.read()
@@ -80,7 +83,7 @@ def extract_text_from_context(context: MinimalSearchResults):
 
 
 def generate_response(context: MinimalSearchResults,
-                      max_new_tokens: int = 150):
+                      max_new_tokens: int = 150) -> Any:
     llm = call_llm()
     result: List[str] = []
     for text in extract_text_from_context(context):
@@ -91,7 +94,7 @@ def generate_response(context: MinimalSearchResults,
     return str(llm.generate(super_prompt, max_new_tokens))
 
 
-def call_llm_foreach_query(context: StudentSearchResults):
+def call_llm_foreach_query(context: StudentSearchResults) -> Any:
     responses = []
     for i, result in enumerate(context.search_results):
         response_text = generate_response(result)
@@ -122,8 +125,9 @@ def create_student_search_results_and_answer(
 
 def json_dump_search_results(answers: StudentSearchResultsAndAnswer,
                              output_file: str
-                             ):
-    search_results_list = {"search_results": [], "k": answers.k}
+                             ) -> Any:
+    search_results_list: dict[str, Any] = {"search_results": [],
+                                           "k": answers.k}
     for data in answers.search_results:
         data_dict = {
             "question_id": data.question_id,
@@ -146,8 +150,9 @@ def json_dump_search_results(answers: StudentSearchResultsAndAnswer,
 
 def json_dump_search_and_answers(
     answers: StudentSearchResultsAndAnswer, output_file: str
-):
-    search_results_list = {"search_results": [], "k": answers.k}
+) -> Any:
+    search_results_list: dict[str, Any] = {"search_results": [],
+                                           "k": answers.k}
     for data in answers.search_results:
         data_dict = {
             "question_id": data.question_id,

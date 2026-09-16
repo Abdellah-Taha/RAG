@@ -26,7 +26,6 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
         exit(1)
 
 
-
 def _build_splitters(chunk_size: int) -> tuple[RecursiveCharacterTextSplitter,
                                                RecursiveCharacterTextSplitter]:
     code_splitter = RecursiveCharacterTextSplitter.from_language(
@@ -44,7 +43,7 @@ def _build_splitters(chunk_size: int) -> tuple[RecursiveCharacterTextSplitter,
 
 
 def load_and_split(list_of_files: list[pathlib.Path],
-                   chunk_size
+                   chunk_size: int
                    ) -> List[Document]:
     try:
         if chunk_size <= 0 or chunk_size > 2000:

@@ -1,27 +1,28 @@
 import json
+from typing import Any
 
 path_code = "data/datasets/AnsweredQuestions/dataset_code_public.json"
 path_docs = "data/datasets/AnsweredQuestions/dataset_docs_public.json"
 
 
-def parse_data_set(file_path: str):
+def parse_data_set(file_path: str) -> list[dict[str, str]]:
     with open(file_path, "r", encoding="utf-8") as f:
         son = json.load(f)
+    result: list[dict[str, str]] = son.get("rag_questions", [])
+    return result
 
-    return son.get("rag_questions", [])
 
-
-def retrieve_questions(file_path: str):
+def retrieve_questions(file_path: str) -> Any:
     data_set = parse_data_set(file_path)
     return [item["question"] for item in data_set]
 
 
-def retrieve_data_source(file_path: str):
+def retrieve_data_source(file_path: str) -> Any:
     data_set = parse_data_set(file_path)
     return [item["sources"] for item in data_set]
 
 
-def retrieve_question_id(file_path: str):
+def retrieve_question_id(file_path: str) -> Any:
     data_set = parse_data_set(file_path)
     return [item["question_id"] for item in data_set]
 
@@ -37,8 +38,11 @@ def calculate_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
 
 
 def evaluate_data(
-    output_path: str, dataset_path: str, k=5, iou_threshold: float = 0.05
-):
+    output_path: str,
+    dataset_path: str,
+    k: int = 5,
+    iou_threshold: float = 0.05
+) -> Any:
     try:
         with open(output_path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -95,6 +99,5 @@ def evaluate_data(
         return recall_at_k, len(per_question_recalls)
 
     except Exception as e:
-        print(f"Error during evaluation: \
-{e} at line: {e.__traceback__.tb_lineno}")
+        print(f"Error during evaluation: {e}")
         exit(99)

@@ -1,23 +1,23 @@
 from .data_models import (MinimalSearchResults,
                           MinimalSource,
                           StudentSearchResults)
-from typing import List
+from typing import List, Any
 from .retrieval import chromadb_retrieval, retrieval
 from functools import lru_cache
 from collections import defaultdict
 
 
 @lru_cache(maxsize=128)
-def cached_retrieval(query: str, max_k=50):
+def cached_retrieval(query: str, max_k: int = 50) -> Any:
     return retrieval(query, max_k)
 
 
 @lru_cache(maxsize=128)
-def cached_chromadb_retrieval(query: str, max_k=50):
+def cached_chromadb_retrieval(query: str, max_k: int = 50) -> Any:
     return chromadb_retrieval(query, max_k)
 
 
-def build_chromadb_retrieved_data(query: str, k: int, id=""):
+def build_chromadb_retrieved_data(query: str, k: int, id: str = "") -> Any:
     minimal_search_results = MinimalSearchResults(
         question_id=id, question=query, retrieved_sources=[]
     )
@@ -30,11 +30,10 @@ def build_chromadb_retrieved_data(query: str, k: int, id=""):
                 last_character_index=data["end"],
             )
         )
-        # print(data)
     return minimal_search_results
 
 
-def build_retrieved_data(query: str, k: int, id=""):
+def build_retrieved_data(query: str, k: int, id: str = "") -> Any:
     minimal_search_results = MinimalSearchResults(
         question_id=id, question=query, retrieved_sources=[]
     )
@@ -136,5 +135,4 @@ def reciprocal_rank_fusion(
 
         ranked_ids = sorted(scores, key=scores.get, reverse=True)
         fused_per_query.append([source_by_id[sid] for sid in ranked_ids])
-
     return fused_per_query

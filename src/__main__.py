@@ -22,13 +22,14 @@ from .data_models import (
 from pathlib import Path
 import fire
 import time
+from typing import Any
 
 
 class Rag:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def index(self, max_chunk_size=2000):
+    def index(self, max_chunk_size: int = 2000) -> Any:
         start_time = time.time()
         index_files(max_chunk_size)
         chromadb_indexing(max_chunk_size)
@@ -38,14 +39,14 @@ class Rag:
 (Time taken: {end_time - start_time:.2f} seconds)"
         )
 
-    def search(self, query, k=5):
+    def search(self, query: str, k: int = 5) -> Any:
         # check if processed data exists, if not, run index
         data_path = Path("data/processed")
         data_raw = Path("data/raw")
         raw_files_date = files_mtime(data_raw)
         processed_files_date = files_mtime(data_path)
         if (raw_files_date > processed_files_date) or not data_path.exists():
-            self.index
+            self.index()
         bm25_results = total_search_results([query], [""], k)
         chroma_res = total_chromadb_search_results([query], [""], k)
 
@@ -55,7 +56,10 @@ class Rag:
             print(f"[{record.first_character_index}\
 :{record.last_character_index}]")
 
-    def search_dataset(self, dataset_path, k=10, save_directory="data/output"):
+    def search_dataset(self,
+                       dataset_path: str,
+                       k: int = 10,
+                       save_directory: str = "data/output") -> Any:
         output_path = save_directory + "/" + Path(dataset_path).name
 
         question_ids = retrieve_question_id(dataset_path)
@@ -80,7 +84,7 @@ class Rag:
 
         print(f"Saved student_search_results to {output_file}")
 
-    def answer(self, query, k=5):
+    def answer(self, query: str, k: int = 5) -> Any:
         if not os.path.exists("data/processed/"):
             self.index()
         bm25_results = total_search_results([query], [""], k)
@@ -92,9 +96,9 @@ class Rag:
         print(generate_response(minimal_search_results))
 
     def answer_dataset(self,
-                       student_search_results_path,
-                       save_directory="data/output"
-                       ):
+                       student_search_results_path: str,
+                       save_directory: str = "data/output"
+                       ) -> Any:
 
         output_path = save_directory + "/\
 " + Path(student_search_results_path).name
@@ -111,11 +115,13 @@ class Rag:
         )
         print(f"Saved student_search_results_and_answers to {answers}")
 
-    def evaluate(self, student_search_results_path, dataset_path):
+    def evaluate(self,
+                 student_search_results_path: str,
+                 dataset_path: str) -> Any:
         evaluate_data(student_search_results_path, dataset_path)
 
 
-def main():
+def main() -> None:
     try:
         fire.Fire(Rag)
     except BaseException as e:

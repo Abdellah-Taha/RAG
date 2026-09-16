@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from .data_loading import retrieve_files, load_and_split
 from langchain_core.documents import Document
 import bm25s
@@ -10,7 +10,7 @@ BATCH_SIZE = 600
 data_path = pathlib.Path("data/raw/vllm-0.10.1")
 
 
-def files_mtime(folder: pathlib.Path):
+def files_mtime(folder: pathlib.Path) -> Any:
     try:
         file_times = (
             f.stat().st_mtime for f in folder.rglob("*") if f.is_file()
@@ -21,7 +21,7 @@ def files_mtime(folder: pathlib.Path):
         exit(67)
 
 
-def get_metadata(documents: List[Document]):
+def get_metadata(documents: List[Document]) -> Any:
     try:
         content: List[str] = []
         metadata: List[dict] = []
@@ -41,7 +41,7 @@ def get_metadata(documents: List[Document]):
         exit(1)
 
 
-def index_files(chunk_size: int):
+def index_files(chunk_size: int) -> Any:
     try:
         sample = retrieve_files(data_path)
         documents: List[Document] = load_and_split(sample, chunk_size)
@@ -58,7 +58,7 @@ def index_files(chunk_size: int):
         exit(3)
 
 
-def chromadb_indexing(chunk_size: int):
+def chromadb_indexing(chunk_size: int) -> Any:
     try:
         sample = retrieve_files(data_path)
         documents: List[Document] = load_and_split(sample, chunk_size)
