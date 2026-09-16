@@ -1,8 +1,12 @@
 data/processed/
 src/__pycache__
-moulinette.zip
 data/raw/vllm-0.10.1
 moulinette-fedora
 moulinette-ubuntu
 exams
 evaluations
+datasets_private.zip
+datasets_public.zip
+vllm-0.10.1.zip
+moulinette.zip
+exams.zip

@@ -60,6 +60,13 @@ def evaluate_data(
                 print(f"Question ID {qid} not found in dataset; skipping.")
                 continue
 
+            if "sources" not in dataset_result:
+                print(f"[{qid}] missing 'sources'. Available keys: {list(dataset_result.keys())}")
+                continue
+            if dataset_result is None:
+                print(f"Question ID {qid} not found in dataset; skipping.")
+                continue
+
             if student_result["question"] != dataset_result["question"]:
                 print(f"Question text mismatch for {qid}.")
 

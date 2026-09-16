@@ -40,7 +40,6 @@ class Rag:
         )
 
     def search(self, query: str, k: int = 5) -> Any:
-        # check if processed data exists, if not, run index
         data_path = Path("data/processed")
         data_raw = Path("data/raw")
         raw_files_date = files_mtime(data_raw)
@@ -87,6 +86,9 @@ class Rag:
     def answer(self, query: str, k: int = 5) -> Any:
         if not os.path.exists("data/processed/"):
             self.index()
+        if query.strip() == "":
+            print("Query cannot be empty.")
+            return
         bm25_results = total_search_results([query], [""], k)
         chroma_res = total_chromadb_search_results([query], [""], k)
         fused = reciprocal_rank_fusion(bm25_results, chroma_res)
@@ -117,8 +119,10 @@ class Rag:
 
     def evaluate(self,
                  student_search_results_path: str,
-                 dataset_path: str) -> Any:
-        evaluate_data(student_search_results_path, dataset_path)
+                 dataset_path: str,
+                 k: int = 5,
+                 ) -> Any:
+        evaluate_data(student_search_results_path, dataset_path, k)
 
 
 def main() -> None:

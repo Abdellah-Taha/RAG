@@ -39,6 +39,8 @@ restating the question or explaining "
                     "your reasoning. If the context \
 includes a specific endpoint, command, "
                     "or value, quote it exactly."
+                    "if the answer is not contained within"
+                    "the context, say \"I don't know\"."
                 ),
             },
             {"role": "user", "content": prompt},
