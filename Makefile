@@ -2,7 +2,7 @@ install:
 	uv sync
 
 run:
-	uv run python3 -m src pipeline
+	uv run python3 -m src index
 
 debug:
 	uv run python3 -m pdb src/__main__.py
@@ -14,7 +14,3 @@ clean:
 lint:
 	-flake8 src
 	mypy src --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-
-lint-strict:
-	-flake8 src
-	mypy src --strict

@@ -54,4 +54,4 @@ def load_and_split(list_of_files: list[pathlib.Path], chunk_size) -> List[Docume
         return documents
     except BaseException as e:
         print(e)
-        exit(2)
+        exit(20)
