@@ -1,29 +1,30 @@
-from typing import List
-from .build_retrieved_data import total_search_results, total_chromadb_search_results
 import json
-
-from .data_models import MinimalSource
 
 path_code = "data/datasets/AnsweredQuestions/dataset_code_public.json"
 path_docs = "data/datasets/AnsweredQuestions/dataset_docs_public.json"
 
+
 def parse_data_set(file_path: str):
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         son = json.load(f)
-    
+
     return son.get("rag_questions", [])
+
 
 def retrieve_questions(file_path: str):
     data_set = parse_data_set(file_path)
     return [item["question"] for item in data_set]
 
+
 def retrieve_data_source(file_path: str):
     data_set = parse_data_set(file_path)
     return [item["sources"] for item in data_set]
 
+
 def retrieve_question_id(file_path: str):
     data_set = parse_data_set(file_path)
     return [item["question_id"] for item in data_set]
+
 
 def calculate_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
     inter_start = max(a_start, b_start)
@@ -35,7 +36,9 @@ def calculate_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
     return intersection / union
 
 
-def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float = 0.05):
+def evaluate_data(
+    output_path: str, dataset_path: str, k=5, iou_threshold: float = 0.05
+):
     try:
         with open(output_path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -67,9 +70,12 @@ def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float
                 match = any(
                     retrieved["file_path"] == gold["file_path"]
                     and calculate_iou(
-                        gold["first_character_index"], gold["last_character_index"],
-                        retrieved["first_character_index"], retrieved["last_character_index"],
-                    ) >= iou_threshold
+                        gold["first_character_index"],
+                        gold["last_character_index"],
+                        retrieved["first_character_index"],
+                        retrieved["last_character_index"],
+                    )
+                    >= iou_threshold
                     for retrieved in retrieved_sources
                 )
                 if match:
@@ -82,17 +88,13 @@ def evaluate_data(output_path: str, dataset_path: str, k=5, iou_threshold: float
             return 0.0, 0
 
         recall_at_k = sum(per_question_recalls) / len(per_question_recalls)
-        print(f"Evaluation complete! Recall@{k}: {recall_at_k:.4f} over {len(per_question_recalls)} questions.")
+        print(
+            f"Evaluation complete! Recall@{k}: \
+{recall_at_k:.4f} over {len(per_question_recalls)} questions."
+        )
         return recall_at_k, len(per_question_recalls)
 
     except Exception as e:
-        print(f"Error during evaluation: {e} at line: {e.__traceback__.tb_lineno}")
+        print(f"Error during evaluation: \
+{e} at line: {e.__traceback__.tb_lineno}")
         exit(99)
-
-
-def main():
-    evaluate_data("data/output/search_results/AnsweredQuestions/dataset_docs_public.json",
-                  "data/datasets/AnsweredQuestions/dataset_docs_public.json")
-
-if __name__ == "__main__":
-    main()

@@ -14,7 +14,11 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
     try:
         list_of_files: list[pathlib.Path] = []
         for item in path.rglob("*"):
-            if item.is_file() and item.suffix in PERMITTED_EXTENSIONS and not any(skip_dir in item.parts for skip_dir in SKIP_DIRS):
+            if (
+                item.is_file()
+                and item.suffix in PERMITTED_EXTENSIONS
+                and not any(skip_dir in item.parts for skip_dir in SKIP_DIRS)
+            ):
                 list_of_files.append(item)
         return list_of_files
     except BaseException as e:
@@ -37,7 +41,9 @@ def _build_splitters(chunk_size: int):
     return code_splitter, text_splitter
 
 
-def load_and_split(list_of_files: list[pathlib.Path], chunk_size) -> List[Document]:
+def load_and_split(list_of_files: list[pathlib.Path],
+                   chunk_size
+                   ) -> List[Document]:
     try:
         if chunk_size <= 0 or chunk_size > 2000:
             raise ValueError("chunk_size must be between 1 and 2000")
@@ -47,7 +53,11 @@ def load_and_split(list_of_files: list[pathlib.Path], chunk_size) -> List[Docume
             try:
                 loader = TextLoader(file_path, autodetect_encoding=True)
                 loaded_documents = loader.load()
-                splitter = code_splitter if file_path.suffix in CODE_EXTENSIONS else text_splitter
+                splitter = (
+                    code_splitter
+                    if file_path.suffix in CODE_EXTENSIONS
+                    else text_splitter
+                )
                 documents.extend(splitter.split_documents(loaded_documents))
             except Exception as e:
                 print(f"Warning: Could not read {file_path}: {e}")
