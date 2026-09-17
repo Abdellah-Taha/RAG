@@ -125,7 +125,7 @@ def create_student_search_results_and_answer(
                                          k=context.k)
 
 
-def json_dump_search_results(answers: StudentSearchResultsAndAnswer,
+def json_dump_search_results(answers: StudentSearchResults,
                              output_file: str
                              ) -> Any:
     search_results_list: dict[str, Any] = {"search_results": [],

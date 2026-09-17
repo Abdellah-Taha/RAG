@@ -5,10 +5,10 @@ path_code = "data/datasets/AnsweredQuestions/dataset_code_public.json"
 path_docs = "data/datasets/AnsweredQuestions/dataset_docs_public.json"
 
 
-def parse_data_set(file_path: str) -> list[dict[str, str]]:
+def parse_data_set(file_path: str) -> list[dict[str, Any]]:
     with open(file_path, "r", encoding="utf-8") as f:
         son = json.load(f)
-    result: list[dict[str, str]] = son.get("rag_questions", [])
+    result: list[dict[str, Any]] = son.get("rag_questions", [])
     return result
 
 
@@ -61,7 +61,8 @@ def evaluate_data(
                 continue
 
             if "sources" not in dataset_result:
-                print(f"[{qid}] missing 'sources'. Available keys: {list(dataset_result.keys())}")
+                print(f"[{qid}] missing 'sources'. \
+Available keys: {list(dataset_result.keys())}")
                 continue
             if dataset_result is None:
                 print(f"Question ID {qid} not found in dataset; skipping.")

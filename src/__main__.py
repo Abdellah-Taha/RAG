@@ -4,6 +4,7 @@ import os
 from .llm_call import (
     call_llm_foreach_query,
     generate_response,
+    create_student_search_results_and_answer,
     json_dump_search_and_answers,
     json_dump_search_results,
 )
@@ -107,12 +108,13 @@ class Rag:
 
         with open(student_search_results_path, "r") as f:
             student_search_results = json.load(f)
-        responses = call_llm_foreach_query(
-            StudentSearchResults(**student_search_results)
+        context = StudentSearchResults(**student_search_results)
+        responses = call_llm_foreach_query(context)
+        results_and_answers = create_student_search_results_and_answer(
+            context, responses
         )
         answers = json_dump_search_and_answers(
-            StudentSearchResults(**student_search_results),
-            responses,
+            results_and_answers,
             output_path
         )
         print(f"Saved student_search_results_and_answers to {answers}")

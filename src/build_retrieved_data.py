@@ -133,6 +133,6 @@ def reciprocal_rank_fusion(
             scores[sid] += 1.0 / (k + rank)
             source_by_id[sid] = source
 
-        ranked_ids = sorted(scores, key=scores.get, reverse=True)
+        ranked_ids = sorted(scores, key=lambda sid: scores[sid], reverse=True)
         fused_per_query.append([source_by_id[sid] for sid in ranked_ids])
     return fused_per_query
