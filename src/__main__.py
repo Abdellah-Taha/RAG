@@ -27,10 +27,21 @@ from typing import Any
 
 
 class Rag:
+    """Expose indexing, retrieval, answering, and evaluation commands."""
+
     def __init__(self) -> None:
+        """Initialize the command interface."""
         pass
 
     def index(self, max_chunk_size: int = 2000) -> Any:
+        """Build the BM25 and ChromaDB indices for the raw documents.
+
+        Args:
+            max_chunk_size: Maximum number of characters per indexed chunk.
+
+        Returns:
+            None. Index data is written to the processed-data directory.
+        """
         start_time = time.time()
         index_files(max_chunk_size)
         chromadb_indexing(max_chunk_size)
@@ -41,6 +52,15 @@ class Rag:
         )
 
     def search(self, query: str, k: int = 5) -> Any:
+        """Retrieve and print the best source ranges for a query.
+
+        Args:
+            query: Question or search text.
+            k: Number of source ranges to print.
+
+        Returns:
+            None. Results are printed to standard output.
+        """
         data_path = Path("data/processed")
         data_raw = Path("data/raw")
         raw_files_date = files_mtime(data_raw)
@@ -60,6 +80,16 @@ class Rag:
                        dataset_path: str,
                        k: int = 10,
                        save_directory: str = "data/output") -> Any:
+        """Search every question in a dataset and save the results.
+
+        Args:
+            dataset_path: Path to the dataset JSON file.
+            k: Number of sources to retrieve per question.
+            save_directory: Directory in which to write the result file.
+
+        Returns:
+            None. Search results are saved as JSON.
+        """
         output_path = save_directory + "/" + Path(dataset_path).name
 
         question_ids = retrieve_question_id(dataset_path)
@@ -85,6 +115,15 @@ class Rag:
         print(f"Saved student_search_results to {output_file}")
 
     def answer(self, query: str, k: int = 5) -> Any:
+        """Retrieve context and print a generated answer for a query.
+
+        Args:
+            query: Question to answer.
+            k: Number of source ranges to use as context.
+
+        Returns:
+            None. The generated answer is printed to standard output.
+        """
         if not os.path.exists("data/processed/"):
             self.index()
         if query.strip() == "":
@@ -102,6 +141,15 @@ class Rag:
                        student_search_results_path: str,
                        save_directory: str = "data/output"
                        ) -> Any:
+        """Generate answers for saved search results and write them to JSON.
+
+        Args:
+            student_search_results_path: Path to saved search results.
+            save_directory: Directory in which to write the answer file.
+
+        Returns:
+            None. Search results and answers are saved as JSON.
+        """
 
         output_path = save_directory + "/\
 " + Path(student_search_results_path).name
@@ -124,10 +172,21 @@ class Rag:
                  dataset_path: str,
                  k: int = 5,
                  ) -> Any:
+        """Evaluate saved search results against a gold dataset.
+
+        Args:
+            student_search_results_path: Path to saved search results.
+            dataset_path: Path to the gold dataset JSON file.
+            k: Number of retrieved sources to evaluate per question.
+
+        Returns:
+            None. Evaluation metrics are printed to standard output.
+        """
         evaluate_data(student_search_results_path, dataset_path, k)
 
 
 def main() -> None:
+    """Run the Fire command-line interface for the RAG application."""
     try:
         fire.Fire(Rag)
     except BaseException as e:

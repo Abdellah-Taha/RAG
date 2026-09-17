@@ -11,6 +11,14 @@ data_path = pathlib.Path("data/raw/vllm-0.10.1")
 
 
 def files_mtime(folder: pathlib.Path) -> Any:
+    """Return the latest modification time beneath a folder.
+
+    Args:
+        folder: Directory whose files should be inspected.
+
+    Returns:
+        The latest file modification time, or the directory time if empty.
+    """
     try:
         file_times = (
             f.stat().st_mtime for f in folder.rglob("*") if f.is_file()
@@ -22,6 +30,14 @@ def files_mtime(folder: pathlib.Path) -> Any:
 
 
 def get_metadata(documents: List[Document]) -> Any:
+    """Extract searchable content and source ranges from documents.
+
+    Args:
+        documents: Documents produced by the data-loading pipeline.
+
+    Returns:
+        A tuple containing source metadata and document text.
+    """
     try:
         content: List[str] = []
         metadata: List[dict] = []
@@ -42,6 +58,14 @@ def get_metadata(documents: List[Document]) -> Any:
 
 
 def index_files(chunk_size: int) -> Any:
+    """Build and save the BM25 index for the raw data files.
+
+    Args:
+        chunk_size: Maximum number of characters in each indexed chunk.
+
+    Returns:
+        None. The index is written to the processed-data directory.
+    """
     try:
         sample = retrieve_files(data_path)
         documents: List[Document] = load_and_split(sample, chunk_size)
@@ -59,6 +83,14 @@ def index_files(chunk_size: int) -> Any:
 
 
 def chromadb_indexing(chunk_size: int) -> Any:
+    """Build and save the ChromaDB index for the raw data files.
+
+    Args:
+        chunk_size: Maximum number of characters in each indexed chunk.
+
+    Returns:
+        The metadata records written to ChromaDB.
+    """
     try:
         sample = retrieve_files(data_path)
         documents: List[Document] = load_and_split(sample, chunk_size)

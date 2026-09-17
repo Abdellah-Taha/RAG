@@ -11,6 +11,14 @@ data = pathlib.Path("data/raw/vllm-0.10.1")
 
 
 def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
+    """Find supported source files below a directory.
+
+    Args:
+        path: Root directory to search recursively.
+
+    Returns:
+        Paths to supported files, excluding configured directories.
+    """
     try:
         list_of_files: list[pathlib.Path] = []
         for item in path.rglob("*"):
@@ -28,6 +36,14 @@ def retrieve_files(path: pathlib.Path) -> list[pathlib.Path]:
 
 def _build_splitters(chunk_size: int) -> tuple[RecursiveCharacterTextSplitter,
                                                RecursiveCharacterTextSplitter]:
+    """Create splitters for Python code and other text files.
+
+    Args:
+        chunk_size: Maximum number of characters in a document chunk.
+
+    Returns:
+        A code splitter and a general text splitter.
+    """
     code_splitter = RecursiveCharacterTextSplitter.from_language(
         language=Language.PYTHON,
         chunk_size=chunk_size,
@@ -45,6 +61,15 @@ def _build_splitters(chunk_size: int) -> tuple[RecursiveCharacterTextSplitter,
 def load_and_split(list_of_files: list[pathlib.Path],
                    chunk_size: int
                    ) -> List[Document]:
+    """Load supported files and split them into indexed documents.
+
+    Args:
+        list_of_files: Files to load and split.
+        chunk_size: Maximum number of characters in each chunk.
+
+    Returns:
+        Documents generated from the readable input files.
+    """
     try:
         if chunk_size <= 0 or chunk_size > 2000:
             raise ValueError("chunk_size must be between 1 and 2000")

@@ -6,6 +6,14 @@ path_docs = "data/datasets/AnsweredQuestions/dataset_docs_public.json"
 
 
 def parse_data_set(file_path: str) -> list[dict[str, Any]]:
+    """Load the question records from a dataset JSON file.
+
+    Args:
+        file_path: Path to the dataset JSON file.
+
+    Returns:
+        Question records under the dataset's ``rag_questions`` key.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         son = json.load(f)
     result: list[dict[str, Any]] = son.get("rag_questions", [])
@@ -13,21 +21,56 @@ def parse_data_set(file_path: str) -> list[dict[str, Any]]:
 
 
 def retrieve_questions(file_path: str) -> Any:
+    """Extract question text from a dataset file.
+
+    Args:
+        file_path: Path to the dataset JSON file.
+
+    Returns:
+        Question strings in dataset order.
+    """
     data_set = parse_data_set(file_path)
     return [item["question"] for item in data_set]
 
 
 def retrieve_data_source(file_path: str) -> Any:
+    """Extract gold source references from a dataset file.
+
+    Args:
+        file_path: Path to the dataset JSON file.
+
+    Returns:
+        Source-reference collections in dataset order.
+    """
     data_set = parse_data_set(file_path)
     return [item["sources"] for item in data_set]
 
 
 def retrieve_question_id(file_path: str) -> Any:
+    """Extract question identifiers from a dataset file.
+
+    Args:
+        file_path: Path to the dataset JSON file.
+
+    Returns:
+        Question identifiers in dataset order.
+    """
     data_set = parse_data_set(file_path)
     return [item["question_id"] for item in data_set]
 
 
 def calculate_iou(a_start: int, a_end: int, b_start: int, b_end: int) -> float:
+    """Calculate intersection over union for two character ranges.
+
+    Args:
+        a_start: Start offset of the first range.
+        a_end: End offset of the first range.
+        b_start: Start offset of the second range.
+        b_end: End offset of the second range.
+
+    Returns:
+        The ratio of the intersection length to the union length.
+    """
     inter_start = max(a_start, b_start)
     inter_end = min(a_end, b_end)
     intersection = max(0, inter_end - inter_start)
@@ -43,6 +86,17 @@ def evaluate_data(
     k: int = 5,
     iou_threshold: float = 0.05
 ) -> Any:
+    """Evaluate retrieved sources against the gold dataset.
+
+    Args:
+        output_path: Path to the student search-results JSON file.
+        dataset_path: Path to the gold dataset JSON file.
+        k: Number of retrieved sources to evaluate per question.
+        iou_threshold: Minimum range overlap required for a source match.
+
+    Returns:
+        A tuple containing mean recall at ``k`` and the number evaluated.
+    """
     try:
         with open(output_path, "r", encoding="utf-8") as f:
             data = json.load(f)

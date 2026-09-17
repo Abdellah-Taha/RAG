@@ -5,6 +5,11 @@ import chromadb
 
 @lru_cache()
 def load_bm25_index() -> bm25s.BM25:
+    """Load and cache the persisted BM25 index.
+
+    Returns:
+        The loaded BM25 index with its corpus available.
+    """
     try:
         return bm25s.BM25.load("data/processed/bm25_index",
                                load_corpus=True,
@@ -15,6 +20,15 @@ def load_bm25_index() -> bm25s.BM25:
 
 
 def retrieval(query: str, k: int) -> tuple[list[str], list[float]]:
+    """Retrieve the highest-scoring BM25 records for a query.
+
+    Args:
+        query: Text to tokenize and search for.
+        k: Maximum number of records to return.
+
+    Returns:
+        A tuple containing retrieved records and their scores.
+    """
     try:
         retriever = load_bm25_index()
         query_tokens = bm25s.tokenize(query)
@@ -29,6 +43,11 @@ def retrieval(query: str, k: int) -> tuple[list[str], list[float]]:
 
 @lru_cache()
 def load_chroma_collection() -> chromadb.api.models.Collection:
+    """Load and cache the persisted ChromaDB collection.
+
+    Returns:
+        The configured ChromaDB collection.
+    """
     try:
         client = chromadb.PersistentClient(path="data/processed/chroma_index")
         return client.get_collection(name="rag_collection")
@@ -38,6 +57,15 @@ def load_chroma_collection() -> chromadb.api.models.Collection:
 
 
 def chromadb_retrieval(query: str, k: int) -> list[dict[str, str]]:
+    """Retrieve the nearest ChromaDB documents for a query.
+
+    Args:
+        query: Text to search for.
+        k: Maximum number of documents to return.
+
+    Returns:
+        ChromaDB's query response containing documents and metadata.
+    """
     try:
         collection: chromadb.api.models.Collection = load_chroma_collection()
         return_results: list[dict[str, str]] = collection.query(
